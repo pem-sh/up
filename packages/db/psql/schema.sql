@@ -22,3 +22,26 @@ CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS health_checks (
+  id TEXT PRIMARY KEY DEFAULT 'hc_' || replace(cast(gen_random_uuid() as text), '-', ''),
+  url TEXT NOT NULL,
+  http_method TEXT NOT NULL,
+  request_body TEXT,
+  request_headers JSONB,
+  content_type TEXT,
+  follow_redirects BOOLEAN NOT NULL DEFAULT true,
+  accepted_status_codes TEXT[] NOT NULL,
+  auth_type TEXT,
+  auth JSONB,
+
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  created_by TEXT NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_by TEXT NOT NULL
+);
+
+CREATE TRIGGER set_updated_at
+BEFORE UPDATE ON health_checks
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
