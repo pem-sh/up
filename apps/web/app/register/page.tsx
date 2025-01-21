@@ -8,6 +8,7 @@ import {
   Heading,
   TextField,
 } from '@radix-ui/themes'
+import { signIn } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { FormValues, registerUser } from './actions'
 
@@ -17,6 +18,7 @@ export default function Register() {
   const onSubmit = async (data: FormValues) => {
     try {
       await registerUser(data)
+      signIn('credentials', { email: data.email, password: data.password })
     } catch (error) {
       console.error(error)
     }
