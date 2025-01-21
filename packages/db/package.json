@@ -1,0 +1,25 @@
+{
+  "name": "@pem/db",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "10.16.0",
+    "@pem/eslint-config": "workspace:*",
+    "@pem/typescript-config": "workspace:*",
+    "@types/node": "20.11.24",
+    "@types/pg": "8.11.10",
+    "typescript": "5.5.4",
+    "vitest": "2.1.8"
+  },
+  "dependencies": {
+    "pg": "8.13.1"
+  }
+}
