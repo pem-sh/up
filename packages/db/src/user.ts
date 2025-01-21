@@ -8,6 +8,13 @@ namespace DB {
       password: string
       created_by: string
     }
+    export type Update = {
+      id: string
+      name?: string
+      email?: string
+      password?: string
+      updated_by: string
+    }
   }
 
   export type User = {
@@ -85,10 +92,51 @@ async function fetch(
   return rows[0] || null
 }
 
+async function update(this: Database, input: DB.User.Update): Promise<DB.User> {
+  const updateFields = ['updated_at', 'updated_by']
+  const values = [this.updatedAt(), input.updated_by]
+
+  // Add optional fields if they exist
+  if (input.name) {
+    updateFields.push('name')
+    values.push(input.name)
+  }
+  if (input.email) {
+    updateFields.push('email')
+    values.push(input.email)
+  }
+  if (input.password) {
+    updateFields.push('password')
+    values.push(input.password)
+  }
+
+  // Add id as the last parameter
+  values.push(input.id)
+
+  const setClause = updateFields
+    .map((field, index) => `${field} = $${index + 1}`)
+    .join(', ')
+
+  const { rows } = await this.query<DB.User>(
+    `
+      UPDATE users
+      SET ${setClause}
+      WHERE id = $${values.length}
+      RETURNING *
+    `,
+    values,
+  )
+
+  const user = rows[0]
+  if (!user) throw new Error('Failed to update user')
+  return user
+}
+
 export function createUserFactory(db: Database) {
   return {
     create: create.bind(db),
     fetch: fetch.bind(db),
+    update: update.bind(db),
   }
 }
 

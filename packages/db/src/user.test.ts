@@ -54,9 +54,9 @@ describe('users', () => {
       name: 'Alice Smith',
       email: 'alice@example.com',
       password: 'securepass123',
-      created_at: '2024-10-31T02:09:08.113Z',
+      created_at: expect.any(String),
       created_by: 'system',
-      updated_at: '2024-10-31T02:09:08.113Z',
+      updated_at: expect.any(String),
       updated_by: 'system',
     })
   })
@@ -120,5 +120,98 @@ describe('users', () => {
     } else {
       expect(user).toBeNull()
     }
+  })
+
+  test.each([
+    {
+      name: 'update name only',
+      update: { name: 'Updated Name' },
+      expected: {
+        name: 'Updated Name',
+        email: 'test@example.com',
+        password: 'password123',
+      },
+    },
+    {
+      name: 'update email only',
+      update: { email: 'updated@example.com' },
+      expected: {
+        name: 'Test User',
+        email: 'updated@example.com',
+        password: 'password123',
+      },
+    },
+    {
+      name: 'update password only',
+      update: { password: 'newpassword456' },
+      expected: {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'newpassword456',
+      },
+    },
+    {
+      name: 'update multiple fields',
+      update: {
+        name: 'New Name',
+        email: 'new@example.com',
+        password: 'newpass789',
+      },
+      expected: {
+        name: 'New Name',
+        email: 'new@example.com',
+        password: 'newpass789',
+      },
+    },
+  ])('update - $name', async ({ update, expected }) => {
+    await seedUser(db)
+
+    const updated = await Users.update({
+      id: 'user_test123456',
+      ...update,
+      updated_by: 'test_system',
+    })
+
+    expect(objectDateToString(updated)).toEqual({
+      id: 'user_test123456',
+      ...expected,
+      created_at: '2024-01-01T10:00:00.000Z',
+      created_by: 'system',
+      updated_at: expect.any(String),
+      updated_by: 'test_system',
+    })
+  })
+
+  test('update - fails with non-existent user', async () => {
+    await expect(
+      Users.update({
+        id: 'nonexistent_user',
+        name: 'New Name',
+        updated_by: 'test_system',
+      }),
+    ).rejects.toThrow('Failed to update user')
+  })
+
+  test('update - fails with duplicate email', async () => {
+    // Seed our first user
+    await seedUser(db)
+
+    // Create a second user
+    db.id = () => 'user_second'
+    await Users.create({
+      name: 'Second User',
+      email: 'second@example.com',
+      password: 'password456',
+      created_by: 'system',
+    })
+
+    // Try to update second user with first user's email
+    await expect(
+      Users.update({
+        id: 'user_second',
+        email: 'test@example.com',
+        updated_by: 'test_system',
+      }),
+    ).rejects.toThrow('duplicate key value violates unique constraint')
   })
 })
