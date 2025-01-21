@@ -1,6 +1,6 @@
 import { Database } from './psql'
 
-namespace DB {
+export namespace DB {
   export namespace User {
     export type Create = {
       name: string
