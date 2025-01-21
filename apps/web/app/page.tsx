@@ -1,6 +1,8 @@
 import { HealthCheck } from '@pem/db'
 import { Box } from '@radix-ui/themes'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   const healthChecks = await HealthCheck.list({ user_id: 'user_1234' })
 
