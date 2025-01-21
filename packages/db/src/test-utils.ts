@@ -16,3 +16,15 @@ export async function setup(): Promise<PSQLDatabase> {
   await db.query(schema)
   return db
 }
+
+export function objectDateToString(o: object): object {
+  const copy: any = {}
+  for (const [key, val] of Object.entries(o)) {
+    if (val instanceof Date) {
+      copy[key] = val.toISOString()
+    } else {
+      copy[key] = val
+    }
+  }
+  return copy
+}

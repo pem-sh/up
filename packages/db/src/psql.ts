@@ -4,6 +4,7 @@ export interface Database {
   id?: () => string
   createdAt: () => string
   updatedAt: () => string
+  query<R extends QueryResultRow>(text: string): Promise<QueryResult<R>>
   query<R extends QueryResultRow>(
     text: string,
     params: any[] | undefined,
