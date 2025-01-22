@@ -6,6 +6,7 @@ import {
   Container,
   Flex,
   Heading,
+  Link as RadixLink,
   Text,
   TextField,
 } from '@radix-ui/themes'
@@ -77,6 +78,13 @@ export default function LoginPage() {
               <Button type="submit" size="3">
                 Sign In
               </Button>
+
+              <Flex justify="center">
+                <Text size="2">
+                  Don&apos;t have an account?{' '}
+                  <RadixLink href="/register">Register here</RadixLink>
+                </Text>
+              </Flex>
             </Flex>
           </form>
         </Card>

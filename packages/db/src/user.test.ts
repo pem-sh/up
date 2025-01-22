@@ -37,7 +37,7 @@ describe('users', () => {
 
   beforeEach(async () => {
     db.id = undefined
-    return db.query(`TRUNCATE TABLE users`)
+    return db.query(`TRUNCATE TABLE users CASCADE`)
   })
 
   test('create', async () => {
