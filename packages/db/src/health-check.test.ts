@@ -2,12 +2,13 @@ import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { createHealthCheckFactory, HealthCheckFactory } from './health-check'
 import { Database } from './psql'
 import { objectDateToString, setup } from './test-utils'
+import { DB } from './user'
 
 let HealthChecks: HealthCheckFactory
 let db: Database
 let userId: string
 
-async function seedUser(db: Database) {
+async function seedUser(db: Database, overrides: Partial<DB.User> = {}) {
   const { rows } = await db.query(`
     INSERT INTO users (
       id,
@@ -19,19 +20,19 @@ async function seedUser(db: Database) {
       updated_at,
       updated_by
     ) VALUES (
-      'user_test123456',
-      'Test User',
-      'test@example.com',
-      'password123',
-      '2024-01-01 10:00:00+00',
-      'system',
-      '2024-01-02 12:00:00+00',
-      'system'
+      ${overrides.id ? `'${overrides.id}'` : "'user_test123456'"},
+      ${overrides.name ? `'${overrides.name}'` : "'Test User'"},
+      ${overrides.email ? `'${overrides.email}'` : "'test@example.com'"},
+      ${overrides.password ? `'${overrides.password}'` : "'password123'"},
+      ${overrides.created_at ? `'${overrides.created_at}'` : "'2024-01-01 10:00:00+00'"},
+      ${overrides.created_by ? `'${overrides.created_by}'` : "'system'"},
+      ${overrides.updated_at ? `'${overrides.updated_at}'` : "'2024-01-02 12:00:00+00'"},
+      ${overrides.updated_by ? `'${overrides.updated_by}'` : "'system'"}
     ) RETURNING id`)
   return rows[0]?.id
 }
 
-async function seedHealthCheck(db: Database, userId: string) {
+async function seedHealthCheck(db: Database, id: string, userId: string) {
   await db.query(
     `
     INSERT INTO health_checks (
@@ -51,8 +52,8 @@ async function seedHealthCheck(db: Database, userId: string) {
       updated_at,
       updated_by
     ) VALUES (
-      'hc_test123456',
       $1,
+      $2,
       'https://example.com',
       'GET',
       NULL,
@@ -67,7 +68,7 @@ async function seedHealthCheck(db: Database, userId: string) {
       '2024-01-02 12:00:00+00',
       'system'
     )`,
-    [userId],
+    [id, userId],
   )
 }
 
@@ -153,7 +154,7 @@ describe('health-checks', () => {
   })
 
   test('list - returns health checks for user', async () => {
-    await seedHealthCheck(db, userId)
+    await seedHealthCheck(db, 'hc_test123456', userId)
 
     const healthChecks = await HealthChecks.list({ user_id: userId })
     expect(healthChecks).toHaveLength(1)
@@ -176,6 +177,31 @@ describe('health-checks', () => {
         updated_by: 'system',
       },
     ])
+  })
+
+  test('list - returns all health checks when no user_id specified', async () => {
+    const otherUserId = await seedUser(db, {
+      id: 'user_test123457',
+      email: 'test2@example.com',
+    })
+
+    await seedHealthCheck(db, 'hc_1', userId)
+    await seedHealthCheck(db, 'hc_2', otherUserId)
+
+    const healthChecks = await HealthChecks.list()
+    expect(healthChecks).toHaveLength(2)
+    expect(healthChecks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          user_id: userId,
+          url: 'https://example.com',
+        }),
+        expect.objectContaining({
+          user_id: otherUserId,
+          url: 'https://example.com',
+        }),
+      ]),
+    )
   })
 
   test.each([
@@ -221,7 +247,7 @@ describe('health-checks', () => {
       },
     },
   ])('update - $name', async ({ update, expected }) => {
-    await seedHealthCheck(db, userId)
+    await seedHealthCheck(db, 'hc_test123456', userId)
 
     const updated = await HealthChecks.update({
       id: 'hc_test123456',
