@@ -1,0 +1,22 @@
+{
+  "name": "@pem/worker",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./index": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.24",
+    "@eslint/js": "^9.17.0",
+    "eslint": "9.21.0",
+    "globals": "^15.12.0",
+    "typescript": "5.5.4"
+  },
+  "dependencies": {
+  }
+}

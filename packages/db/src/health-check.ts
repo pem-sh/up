@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-namespace */
 import { Database } from './psql'
 
@@ -107,22 +108,32 @@ async function create(
   return healthCheck
 }
 
+type ListOptions = {
+  user_id?: string
+}
+
 async function list(
   this: Database,
-  by: {
-    user_id: string
-  },
+  opts: ListOptions = {},
 ): Promise<DB.HealthCheck[]> {
+  const args = []
+  const where: string[] = []
+
+  if (opts.user_id) {
+    const i = args.push(opts.user_id)
+    where.push(`user_id = $${i}`)
+  }
+
+  const whereClause = where.length > 0 ? `WHERE ${where.join('\n')}` : ''
   const { rows } = await this.query<DB.HealthCheck>(
     `
-      SELECT *
-      FROM health_checks
-      WHERE user_id = $1
+      SELECT * 
+      FROM health_checks 
+      ${whereClause}
       ORDER BY created_at DESC
     `,
-    [by.user_id],
+    args,
   )
-
   return rows
 }
 
