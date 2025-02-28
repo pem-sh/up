@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS health_checks (
   auth_type TEXT,
   auth JSONB,
 
+  alarm_state TEXT NOT NULL CHECK (alarm_state IN ('ok', 'alarm')) DEFAULT 'ok',
+
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   created_by TEXT NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),

@@ -15,6 +15,7 @@ export namespace DB {
       accepted_status_codes: string[]
       auth_type?: string
       auth?: Record<string, any>
+      alarm_state?: 'ok' | 'alarm'
       created_by: string
     }
 
@@ -29,6 +30,7 @@ export namespace DB {
       accepted_status_codes?: string[]
       auth_type?: string | null
       auth?: Record<string, any> | null
+      alarm_state?: 'ok' | 'alarm'
       updated_by: string
     }
   }
@@ -45,6 +47,7 @@ export namespace DB {
     accepted_status_codes: string[]
     auth_type: string | null
     auth: Record<string, any> | null
+    alarm_state: 'ok' | 'alarm'
     created_at: Date
     created_by: string
     updated_at: Date
@@ -67,6 +70,7 @@ async function create(
     'accepted_status_codes',
     'auth_type',
     'auth',
+    'alarm_state',
     'created_at',
     'created_by',
     'updated_at',
@@ -85,6 +89,7 @@ async function create(
     input.accepted_status_codes,
     input.auth_type || null,
     input.auth || null,
+    input.alarm_state || 'ok',
     this.createdAt(),
     input.created_by,
     this.updatedAt(),
@@ -181,6 +186,10 @@ async function update(
     updateFields.push('auth')
     values.push(input.auth)
   }
+  if (input.alarm_state !== undefined) {
+    updateFields.push('alarm_state')
+    values.push(input.alarm_state)
+  }
 
   // Add id as the last parameter
   values.push(input.id)
@@ -204,11 +213,28 @@ async function update(
   return healthCheck
 }
 
+async function fetch(
+  this: Database,
+  id: string,
+): Promise<DB.HealthCheck | null> {
+  const { rows } = await this.query<DB.HealthCheck>(
+    `
+      SELECT * 
+      FROM health_checks 
+      WHERE id = $1
+    `,
+    [id],
+  )
+
+  return rows[0] || null
+}
+
 export function createHealthCheckFactory(db: Database) {
   return {
     create: create.bind(db),
     list: list.bind(db),
     update: update.bind(db),
+    fetch: fetch.bind(db),
   }
 }
 

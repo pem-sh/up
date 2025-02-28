@@ -10,7 +10,6 @@ type Base = {
   response_body?: string | null
   response_headers?: Record<string, any> | null
   error?: string | null
-  alarm_state: 'ok' | 'alarm'
 }
 
 const baseColumns = [
@@ -21,7 +20,6 @@ const baseColumns = [
   'response_body',
   'response_headers',
   'error',
-  'alarm_state',
   'created_at',
 ]
 
@@ -51,7 +49,6 @@ async function create(
     input.response_time_ms,
     input.response_body || null,
     input.response_headers || null,
-    input.alarm_state || null,
     input.error || null,
     this.createdAt(),
   ]
