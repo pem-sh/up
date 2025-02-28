@@ -1,4 +1,5 @@
-import { NextRequest } from 'next/server'
+import { HealthCheckResult } from '@pem/db'
+import { NextRequest, NextResponse } from 'next/server'
 
 type RequestBody = {
   health_check_id: string
@@ -12,7 +13,12 @@ type RequestBody = {
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as RequestBody
-  const hc = await HealthCheckResult.create({
+
+  await HealthCheckResult.create({
     ...body,
+  })
+
+  return new NextResponse(null, {
+    status: 202,
   })
 }
