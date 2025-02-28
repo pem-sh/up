@@ -10,7 +10,7 @@ type Base = {
   response_body?: string | null
   response_headers?: Record<string, any> | null
   error?: string | null
-  alarm_state?: string | null
+  alarm_state: 'ok' | 'alarm'
 }
 
 const baseColumns = [
