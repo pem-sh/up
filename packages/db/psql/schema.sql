@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS health_checks (
   auth_type TEXT,
   auth JSONB,
 
+  alarm_state TEXT NOT NULL CHECK (alarm_state IN ('ok', 'alarm')) DEFAULT 'ok',
+
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   created_by TEXT NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
@@ -46,3 +48,15 @@ CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON health_checks
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS health_check_results (
+  id TEXT PRIMARY KEY DEFAULT 'hcr_' || replace(cast(gen_random_uuid() as text), '-', ''),
+  health_check_id TEXT NOT NULL REFERENCES health_checks(id),
+  status TEXT NOT NULL,
+  status_code INTEGER NOT NULL,
+  response_time_ms INTEGER NOT NULL,
+  response_body TEXT,
+  response_headers JSONB,
+  error TEXT,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
