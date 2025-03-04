@@ -1,21 +1,12 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses'
+import { API } from '@pem/api'
 import { DB, HealthCheck, HealthCheckResult, User } from '@pem/db'
 import { NextRequest, NextResponse } from 'next/server'
-
-type RequestBody = {
-  health_check_id: string
-  status: string
-  status_code: number
-  response_time_ms: number
-  response_body: string
-  response_headers: Record<string, string>
-  error: string
-}
 
 const ses = new SESClient()
 
 export async function POST(request: NextRequest) {
-  const body = (await request.json()) as RequestBody
+  const body = (await request.json()) as API.HealthCheckResult
 
   const hc = await HealthCheck.fetch(body.health_check_id)
   if (!hc) {
