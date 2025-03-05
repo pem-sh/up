@@ -1,3 +1,5 @@
+import { APIError404 } from '@/lib/api/errors'
+import HealthCheckResultHelper from '@/lib/check/check'
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses'
 import { API } from '@pem/api'
 import { DB, HealthCheck, HealthCheckResult, User } from '@pem/db'
@@ -9,27 +11,27 @@ export async function POST(request: NextRequest) {
   const body = (await request.json()) as API.HealthCheckResult
 
   const hc = await HealthCheck.fetch(body.health_check_id)
-  if (!hc) {
-    return new NextResponse(
-      JSON.stringify({ error: 'Health check not found' }),
-      {
-        status: 404,
-      },
-    )
-  }
+  if (!hc) return APIError404('Health check not found')
 
-  const hcr = await HealthCheckResult.create({
-    ...body,
+  const error = HealthCheckResultHelper.getError(hc, body)
+  await HealthCheckResult.create({
+    health_check_id: hc.id,
+    status: body.http?.response?.status,
+    status_code: body.http?.response?.status_code,
+    response_time_ms: body.http?.response?.response_time_ms,
+    response_body: body.http?.response?.response_body,
+    response_headers: body.http?.response?.response_headers,
+    error,
   })
 
-  if (hc.alarm_state === 'ok' && hcr.status_code >= 400) {
+  if (hc.alarm_state === 'ok' && !!error) {
     await HealthCheck.update({
       id: hc.id,
       alarm_state: 'alarm',
       updated_by: 'system',
     })
     await emailAlarm(hc)
-  } else if (hc.alarm_state === 'alarm' && hcr.status_code < 400) {
+  } else if (hc.alarm_state === 'alarm' && !error) {
     await HealthCheck.update({
       id: hc.id,
       alarm_state: 'ok',

@@ -25,7 +25,15 @@ const baseColumns = [
 
 export namespace DB {
   export namespace HealthCheckResult {
-    export type Create = Base
+    export type Create = {
+      health_check_id: string
+      status?: string
+      status_code?: number
+      response_time_ms?: number
+      response_body?: string | null
+      response_headers?: Record<string, any> | null
+      error?: string | null
+    }
   }
 
   export type HealthCheckResult = Base & {

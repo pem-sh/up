@@ -31,36 +31,36 @@ async function performCheck(
       headers: check.request_headers ?? {},
       data: check.request_body,
       timeout: 30000,
+      maxRedirects: check.follow_redirects ? 5 : 0,
       validateStatus: () => true, // Don't throw on any status code
     })
 
     const duration = Date.now() - startTime
-    const success = check.accepted_status_codes.includes(
-      response.status.toString(),
+    const headers = Object.fromEntries(
+      Object.entries(response.headers).map(([key, value]) => [
+        key,
+        value.toString(),
+      ]),
     )
 
     return {
       health_check_id: check.id,
-      status: success ? 'ok' : 'alarm',
-      status_code: response.status,
-      response_time_ms: duration,
-      response_body: response.data,
-      response_headers: Object.fromEntries(
-        Object.entries(response.headers).map(([key, value]) => [
-          key,
-          value.toString(),
-        ]),
-      ),
+      http: {
+        response: {
+          status: response.statusText,
+          status_code: response.status,
+          response_time_ms: duration,
+          response_body: response.data,
+          response_headers: headers,
+        },
+      },
     }
   } catch (error) {
     return {
       health_check_id: check.id,
-      status: 'alarm',
-      status_code: 0,
-      response_time_ms: Date.now() - startTime,
-      response_body: '',
-      response_headers: {},
-      error: error instanceof Error ? error.message : 'Unknown error',
+      http: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
     }
   }
 }
