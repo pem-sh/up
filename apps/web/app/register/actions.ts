@@ -2,6 +2,7 @@
 
 import { User } from '@pem/db'
 import { hash } from 'bcrypt'
+import { redirect } from 'next/navigation'
 
 export type FormValues = {
   email: string
@@ -17,4 +18,5 @@ export async function registerUser(data: FormValues) {
     password: hashed,
     created_by: 'system',
   })
+  redirect('/login')
 }

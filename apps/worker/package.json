@@ -1,0 +1,28 @@
+{
+  "name": "@pem/worker",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./index": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@pem/api": "workspace:*",
+    "axios": "1.6.7",
+    "dotenv": "16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.24",
+    "@eslint/js": "9.17.0",
+    "@types/dotenv": "8.2.0",
+    "eslint": "9.21.0",
+    "globals": "15.12.0",
+    "typescript": "5.5.4",
+    "tsx": "4.7.1"
+  }
+}
