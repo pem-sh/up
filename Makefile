@@ -14,3 +14,8 @@ dev.db.up:
 dev.db.down:
 	-docker stop up
 	-docker rm up
+
+
+docker:
+	docker build -t pem-sh/up-www:latest -f apps/web/Dockerfile .
+	docker push pem-sh/up-www:latest
