@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+const AUTH_TOKEN = process.env.AUTH_TOKEN
 const API_HOST = process.env.API_HOST || 'http://localhost:3000'
 const CHECK_INTERVAL = 5 * 60 * 1000 // 5 minutes in milliseconds
 
@@ -11,6 +12,11 @@ async function fetchChecks(): Promise<API.HealthCheck[]> {
   try {
     const response = await axios.get<API.HealthCheckResults>(
       `${API_HOST}/v1/checks`,
+      {
+        headers: {
+          'X-UP-TOKEN': AUTH_TOKEN,
+        },
+      },
     )
     return response.data.results
   } catch (error) {
@@ -68,7 +74,11 @@ async function performCheck(
 async function submitResults(results: API.HealthCheckResult[]): Promise<void> {
   try {
     for (const result of results) {
-      await axios.post(`${API_HOST}/v1/results`, result)
+      await axios.post(`${API_HOST}/v1/results`, result, {
+        headers: {
+          'X-UP-TOKEN': AUTH_TOKEN,
+        },
+      })
     }
   } catch (error) {
     console.error('Error submitting results:', error)

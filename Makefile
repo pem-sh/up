@@ -1,5 +1,5 @@
 run:
-	pnpm run dev --filter=web
+	pnpm run dev --filter=@up/www
 
 test:
 	pnpm test
