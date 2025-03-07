@@ -15,6 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <meta name="apple-mobile-web-app-title" content="Up" />
       <body>
         <Theme>{children}</Theme>
       </body>
