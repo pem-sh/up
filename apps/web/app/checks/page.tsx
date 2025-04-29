@@ -1,7 +1,25 @@
 import { getRequiredUserSession } from '@/lib/auth/auth'
 import { DB, HealthCheck, HealthCheckResult } from '@pem/db'
-import { Button, Container, Flex, Heading } from '@radix-ui/themes'
+import { cn } from '@pem/ui'
+import { Button, Container, Flex, Grid, Heading, Text } from '@radix-ui/themes'
 import Link from 'next/link'
+
+type ResultBlipProps = {
+  result: DB.HealthCheckResult
+}
+
+function ResultBlip({ result }: ResultBlipProps) {
+  console.log(result)
+  return (
+    <div
+      className={cn('rounded h-full w-2', {
+        'bg-green-500': result.status_code >= 200 && result.status_code < 300,
+        'bg-yellow-500': result.status_code >= 300 && result.status_code < 400,
+        'bg-red-500': result.status_code >= 400,
+      })}
+    ></div>
+  )
+}
 
 type CheckProps = {
   hc: DB.HealthCheck
@@ -9,7 +27,16 @@ type CheckProps = {
 }
 
 function Check({ hc, results }: CheckProps) {
-  return <div>{hc.url}</div>
+  return (
+    <Grid columns="1fr 300px">
+      <Text>{hc.name || hc.url}</Text>
+      <Flex>
+        {results.map((result) => (
+          <ResultBlip key={result.id} result={result} />
+        ))}
+      </Flex>
+    </Grid>
+  )
 }
 
 export default async function ChecksPage() {
