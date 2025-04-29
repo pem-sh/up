@@ -1,11 +1,27 @@
 import { getRequiredUserSession } from '@/lib/auth/auth'
-import { HealthCheck } from '@pem/db'
+import { DB, HealthCheck, HealthCheckResult } from '@pem/db'
 import { Button, Container, Flex, Heading } from '@radix-ui/themes'
 import Link from 'next/link'
 
+type CheckProps = {
+  hc: DB.HealthCheck
+  results: DB.HealthCheckResult[]
+}
+
+function Check({ hc, results }: CheckProps) {
+  return <div>{hc.url}</div>
+}
+
 export default async function ChecksPage() {
   const session = await getRequiredUserSession()
-  const healthChecks = await HealthCheck.list({ user_id: session.id })
+  const checks = await HealthCheck.list({ user_id: session.id })
+
+  const results: Record<string, DB.HealthCheckResult[]> = {}
+  for (const hc of checks) {
+    results[hc.id] = await HealthCheckResult.list({
+      health_check_id: hc.id,
+    })
+  }
 
   return (
     <Container>
@@ -15,8 +31,8 @@ export default async function ChecksPage() {
           <Link href="/checks/new">Create</Link>
         </Button>
       </Flex>
-      {healthChecks.map((hc) => (
-        <div key={hc.id}>{hc.url}</div>
+      {checks.map((hc) => (
+        <Check key={hc.id} hc={hc} results={results[hc.id] || []} />
       ))}
     </Container>
   )
