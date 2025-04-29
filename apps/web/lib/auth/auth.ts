@@ -22,7 +22,6 @@ export type SessionUser = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function session({ session, token }: { session: any; token: JWT }) {
-  console.log(`session`, { session, token })
   session.user.id = token.id
   return session
 }
@@ -67,7 +66,6 @@ export const config = {
   callbacks: {
     session,
     async jwt({ token, user }) {
-      console.log(`jwt`, { token, user })
       if (user) token.id = user.id
       return token
     },
@@ -89,7 +87,6 @@ export async function getRequiredUserSession(
     | []
 ): Promise<SessionUser> {
   const session = await getNextAuthServerSession(...args, config)
-  console.log('session', session)
   if (!session || !session.user) throw Error('unauthorized')
   return session.user as SessionUser
 }

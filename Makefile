@@ -19,3 +19,6 @@ dev.db.down:
 docker:
 	docker build -t pem-sh/up-www:latest -f apps/web/Dockerfile .
 	docker push pem-sh/up-www:latest
+
+worker:
+	pnpm --filter @up/worker start

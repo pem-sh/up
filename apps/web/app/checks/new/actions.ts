@@ -8,8 +8,6 @@ export type FormValues = {
 }
 
 export async function createCheck(data: FormValues) {
-  console.log(data)
-
   const session = await getRequiredUserSession()
 
   const hc = await HealthCheck.create({

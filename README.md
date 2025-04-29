@@ -1,11 +1,25 @@
-# up.pem.sh
+# Up
 
-Uptime tracker for devs.
+A simple and powerful website uptime tracker built for devs and small teams.
 
-## Development
+## Local Development
+
+To start, run the database:
+
+```bash
+make dev.db.up
+```
+
+Then you can run the primary webapp:
 
 ```bash
 make run
+```
+
+To run any checks you will need to run the worker locally as well:
+
+```bash
+AUTH_TOKEN=admin make worker
 ```
 
 ## To Do
