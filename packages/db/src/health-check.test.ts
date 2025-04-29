@@ -38,6 +38,7 @@ async function seedHealthCheck(db: Database, id: string, userId: string) {
     INSERT INTO health_checks (
       id,
       user_id,
+      name,
       url,
       http_method,
       request_body,
@@ -55,6 +56,7 @@ async function seedHealthCheck(db: Database, id: string, userId: string) {
     ) VALUES (
       $1,
       $2,
+      'Test Health Check',
       'https://example.com',
       'GET',
       NULL,
@@ -90,6 +92,7 @@ describe('health-checks', () => {
     db.id = () => 'hc_1234'
     const created = await HealthChecks.create({
       user_id: userId,
+      name: 'API Health Check',
       url: 'https://api.example.com',
       http_method: 'POST',
       request_body: '{"key": "value"}',
@@ -105,6 +108,7 @@ describe('health-checks', () => {
     expect(created).toEqual({
       id: 'hc_1234',
       user_id: userId,
+      name: 'API Health Check',
       url: 'https://api.example.com',
       http_method: 'POST',
       request_body: '{"key": "value"}',
@@ -135,6 +139,7 @@ describe('health-checks', () => {
     expect(objectDateToString(created)).toEqual({
       id: 'hc_1234',
       user_id: userId,
+      name: null,
       url: 'https://api.example.com',
       http_method: 'GET',
       request_body: null,
@@ -166,6 +171,7 @@ describe('health-checks', () => {
       {
         id: 'hc_test123456',
         user_id: userId,
+        name: 'Test Health Check',
         url: 'https://example.com',
         http_method: 'GET',
         request_body: null,
@@ -216,19 +222,31 @@ describe('health-checks', () => {
       expected: {
         url: 'https://new.example.com',
         http_method: 'GET',
+        name: 'Test Health Check',
       },
     },
     {
-      name: 'update http_method only',
-      update: { http_method: 'POST' },
+      name: 'update name only',
+      update: { name: 'New Health Check Name' },
       expected: {
         url: 'https://example.com',
-        http_method: 'POST',
+        http_method: 'GET',
+        name: 'New Health Check Name',
+      },
+    },
+    {
+      name: 'update name to null',
+      update: { name: null },
+      expected: {
+        url: 'https://example.com',
+        http_method: 'GET',
+        name: null,
       },
     },
     {
       name: 'update multiple fields',
       update: {
+        name: 'Updated Health Check',
         url: 'https://new.example.com',
         http_method: 'POST',
         request_body: '{"test": true}',
@@ -240,6 +258,7 @@ describe('health-checks', () => {
         auth: { username: 'test', password: 'pass' },
       },
       expected: {
+        name: 'Updated Health Check',
         url: 'https://new.example.com',
         http_method: 'POST',
         request_body: '{"test": true}',

@@ -58,6 +58,7 @@ async function healthCheck(
   const defaults: Record<keyof DB.HealthCheck, unknown> = {
     id: 'health_check_test123456',
     user_id: 'user_test123456',
+    name: 'Test Health Check',
     url: 'https://example.com',
     http_method: 'GET',
     request_body: null,
@@ -81,6 +82,7 @@ async function healthCheck(
     INSERT INTO health_checks (
       id,
       user_id,
+      name,
       url,
       http_method,
       request_body,
@@ -111,11 +113,13 @@ async function healthCheck(
       $13,
       $14,
       $15,
-      $16
+      $16,
+      $17
     )`,
     [
       healthCheck.id,
       healthCheck.user_id,
+      healthCheck.name,
       healthCheck.url,
       healthCheck.http_method,
       healthCheck.request_body,

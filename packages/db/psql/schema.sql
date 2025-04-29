@@ -26,6 +26,7 @@ EXECUTE FUNCTION update_updated_at_column();
 CREATE TABLE IF NOT EXISTS health_checks (
   id TEXT PRIMARY KEY DEFAULT 'hc_' || replace(cast(gen_random_uuid() as text), '-', ''),
   user_id TEXT NOT NULL REFERENCES users(id),
+  name TEXT,
   url TEXT NOT NULL,
   http_method TEXT NOT NULL,
   request_body TEXT,

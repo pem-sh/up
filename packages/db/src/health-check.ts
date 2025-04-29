@@ -6,6 +6,7 @@ export namespace DB {
   export namespace HealthCheck {
     export type Create = {
       user_id: string
+      name?: string
       url: string
       http_method: string
       request_body?: string
@@ -21,6 +22,7 @@ export namespace DB {
 
     export type Update = {
       id: string
+      name?: string | null
       url?: string
       http_method?: string
       request_body?: string | null
@@ -38,6 +40,7 @@ export namespace DB {
   export type HealthCheck = {
     id: string
     user_id: string
+    name: string | null
     url: string
     http_method: string
     request_body: string | null
@@ -61,6 +64,7 @@ async function create(
 ): Promise<DB.HealthCheck> {
   const columns = [
     'user_id',
+    'name',
     'url',
     'http_method',
     'request_body',
@@ -80,6 +84,7 @@ async function create(
 
   const args = [
     input.user_id,
+    input.name || null,
     input.url,
     input.http_method,
     input.request_body || null,
@@ -150,6 +155,10 @@ async function update(
   const values: Array<any> = [this.updatedAt(), input.updated_by]
 
   // Add optional fields if they exist
+  if (input.name !== undefined) {
+    updateFields.push('name')
+    values.push(input.name)
+  }
   if (input.url !== undefined) {
     updateFields.push('url')
     values.push(input.url)
