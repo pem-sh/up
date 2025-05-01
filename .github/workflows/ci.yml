@@ -51,5 +51,6 @@ jobs:
           context: .
           file: ./apps/web/Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/pem-sh/up:latest,ghcr.io/pem-sh/up:${{ github.sha }}
