@@ -52,5 +52,4 @@ jobs:
           file: ./apps/web/Dockerfile
           push: true
           tags: |
-            ghcr.io/pem-sh/up:latest
-            ghcr.io/pem-sh/up:${{ github.sha }}
+            ghcr.io/pem-sh/up:latest,ghcr.io/pem-sh/up:${{ github.sha }}
