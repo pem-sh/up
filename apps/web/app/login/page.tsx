@@ -29,7 +29,7 @@ export default function LoginPage() {
     signIn('credentials', {
       email: data.email,
       password: data.password,
-      callbackUrl: '/',
+      callbackUrl: '/checks',
     })
   }
 

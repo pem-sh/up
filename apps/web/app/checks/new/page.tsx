@@ -1,10 +1,12 @@
 'use client'
 
 import { Button, Container, Heading, TextField } from '@radix-ui/themes'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { createCheck, type FormValues } from './actions'
 
 export default function CreateCheck() {
+  const router = useRouter()
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       url: '',
@@ -14,6 +16,7 @@ export default function CreateCheck() {
   const onSubmit = async (data: FormValues) => {
     try {
       await createCheck(data)
+      router.push('/checks')
     } catch (error) {
       console.error(error)
     }

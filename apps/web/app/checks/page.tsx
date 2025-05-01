@@ -28,14 +28,16 @@ type CheckProps = {
 
 function Check({ hc, results }: CheckProps) {
   return (
-    <Grid columns="1fr 300px">
-      <Text>{hc.name || hc.url}</Text>
-      <Flex>
-        {results.map((result) => (
-          <ResultBlip key={result.id} result={result} />
-        ))}
-      </Flex>
-    </Grid>
+    <Link href={`/checks/${hc.id}`}>
+      <Grid columns="1fr 300px">
+        <Text>{hc.name || hc.url}</Text>
+        <Flex>
+          {results.map((result) => (
+            <ResultBlip key={result.id} result={result} />
+          ))}
+        </Flex>
+      </Grid>
+    </Link>
   )
 }
 
