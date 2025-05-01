@@ -9,7 +9,6 @@ type ResultBlipProps = {
 }
 
 function ResultBlip({ result }: ResultBlipProps) {
-  console.log(result)
   return (
     <div
       className={cn('rounded h-full w-2', {

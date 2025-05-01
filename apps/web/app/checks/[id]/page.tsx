@@ -1,5 +1,5 @@
 import { HealthCheck, HealthCheckResult } from '@pem/db'
-import { Container, Heading } from '@radix-ui/themes'
+import { Container, Heading, Text } from '@radix-ui/themes'
 import { notFound } from 'next/navigation'
 
 type Props = {
@@ -18,6 +18,7 @@ export default async function CheckPage({ params }: Props) {
   return (
     <Container>
       <Heading>{check.name || check.url}</Heading>
+      <Text>{results.length} results</Text>
     </Container>
   )
 }
