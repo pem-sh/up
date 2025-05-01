@@ -9,7 +9,7 @@ dev.db.up:
 	@echo "Waiting 10 seconds for database to start..."
 	@sleep 10
 	psql -h localhost -U postgres -d up -p 5432 -f packages/db/psql/schema.sql
-# psql -h localhost -U postgres -d up -p 5432 -f data.sql
+	psql -h localhost -U postgres -d up -p 5432 -f packages/db/seed/user.sql
 
 dev.db.down:
 	-docker stop up
