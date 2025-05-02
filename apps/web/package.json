@@ -16,16 +16,16 @@
     "@pem/db": "workspace:*",
     "@pem/ui": "workspace:*",
     "@radix-ui/themes": "^3.1.6",
+    "@tailwindcss/postcss": "4.1.4",
     "bcrypt": "5.1.1",
     "next": "15.1.5",
     "next-auth": "4.24.11",
     "pg": "8.13.1",
+    "postcss": "8.5.3",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-hook-form": "7.54.2",
-    "postcss": "8.5.1",
-    "tailwindcss": "4.1.0",
-    "@tailwindcss/postcss": "4.1.4"
+    "tailwindcss": "4.1.0"
   },
   "devDependencies": {
     "@pem/eslint-config": "workspace:*",
