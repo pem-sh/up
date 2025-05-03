@@ -1,38 +1,67 @@
 import { getRequiredUserSession } from '@/lib/auth/auth'
 import { DB, HealthCheck, HealthCheckResult } from '@pem/db'
 import { cn } from '@pem/ui'
-import { Button, Container, Flex, Grid, Heading, Text } from '@radix-ui/themes'
+import {
+  Button,
+  Container,
+  Flex,
+  Grid,
+  Heading,
+  Text,
+  Tooltip,
+} from '@radix-ui/themes'
+import { format } from 'date-fns'
+import { AlertCircleIcon, CircleCheckIcon } from 'lucide-react'
 import Link from 'next/link'
 
 type ResultBlipProps = {
-  result: DB.HealthCheckResult
+  day: Date
+  hasError: boolean
 }
 
-function ResultBlip({ result }: ResultBlipProps) {
+function ResultBlip({ day, hasError }: ResultBlipProps) {
   return (
-    <div
-      className={cn('rounded h-full w-2', {
-        'bg-green-500': result.status_code >= 200 && result.status_code < 300,
-        'bg-yellow-500': result.status_code >= 300 && result.status_code < 400,
-        'bg-red-500': result.status_code >= 400,
-      })}
-    ></div>
+    <Tooltip content={format(day, 'MMMM do')}>
+      <div
+        className={cn('rounded h-full w-2', {
+          'bg-emerald-600': !hasError,
+          'bg-red-600': hasError,
+        })}
+      />
+    </Tooltip>
+  )
+}
+
+function MonitorStatus({ hc }: { hc: DB.HealthCheck }) {
+  return (
+    <Flex align="center" justify="center" p="1">
+      {hc.alarm_state === 'ok' ? (
+        <CircleCheckIcon size="20px" className="stroke-emerald-700" />
+      ) : (
+        <AlertCircleIcon size="20px" />
+      )}
+    </Flex>
   )
 }
 
 type CheckProps = {
   hc: DB.HealthCheck
-  results: DB.HealthCheckResult[]
+  results: DB.HealthCheckResult.ListAggregateResult[]
 }
 
 function Check({ hc, results }: CheckProps) {
   return (
     <Link href={`/checks/${hc.id}`}>
-      <Grid columns="1fr 300px">
+      <Grid columns="auto 1fr 300px">
+        <MonitorStatus hc={hc} />
         <Text>{hc.name || hc.url}</Text>
-        <Flex>
+        <Flex className="gap-[1px]">
           {results.map((result) => (
-            <ResultBlip key={result.id} result={result} />
+            <ResultBlip
+              key={result.day.toISOString()}
+              day={result.day}
+              hasError={result.has_error}
+            />
           ))}
         </Flex>
       </Grid>
@@ -44,24 +73,24 @@ export default async function ChecksPage() {
   const session = await getRequiredUserSession()
   const checks = await HealthCheck.list({ user_id: session.id })
 
-  const results: Record<string, DB.HealthCheckResult[]> = {}
+  const results: Record<string, DB.HealthCheckResult.ListAggregateResult[]> = {}
   for (const hc of checks) {
-    results[hc.id] = await HealthCheckResult.list({
-      health_check_id: hc.id,
-    })
+    results[hc.id] = await HealthCheckResult.listAggregate(hc.id)
   }
 
   return (
     <Container>
       <Flex justify="between" align="center">
-        <Heading>Health Checks</Heading>
+        <Heading>Monitors</Heading>
         <Button asChild>
           <Link href="/checks/new">Create</Link>
         </Button>
       </Flex>
-      {checks.map((hc) => (
-        <Check key={hc.id} hc={hc} results={results[hc.id] || []} />
-      ))}
+      <Flex direction="column" gap="2">
+        {checks.map((hc) => (
+          <Check key={hc.id} hc={hc} results={results[hc.id] || []} />
+        ))}
+      </Flex>
     </Container>
   )
 }

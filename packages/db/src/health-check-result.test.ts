@@ -173,4 +173,121 @@ describe('health-check-results', () => {
     })
     expect(results).toHaveLength(2)
   })
+
+  describe('listAggregate', () => {
+    test('returns empty array when no results exist', async () => {
+      const results = await HealthCheckResults.listAggregate('hc_test123456')
+      expect(results).toEqual([])
+    })
+
+    test('aggregates results by day with default timezone', async () => {
+      const today = new Date()
+      const yesterday = new Date(today)
+      yesterday.setDate(yesterday.getDate() - 1)
+
+      // Add results for today
+      await Seed.healthCheckResult(db, {
+        id: 'hcr_1',
+        health_check_id: 'hc_test123456',
+        created_at: today,
+        error: null,
+      })
+      await Seed.healthCheckResult(db, {
+        id: 'hcr_2',
+        health_check_id: 'hc_test123456',
+        created_at: today,
+        error: 'Some error',
+      })
+
+      // Add result for yesterday
+      await Seed.healthCheckResult(db, {
+        id: 'hcr_3',
+        health_check_id: 'hc_test123456',
+        created_at: yesterday,
+        error: null,
+      })
+
+      const results = await HealthCheckResults.listAggregate('hc_test123456')
+      expect(results).toHaveLength(2)
+
+      // Today should have has_error: true because of the error result
+      expect(results[0]).toEqual({
+        day: expect.any(Date),
+        has_error: true,
+      })
+
+      // Yesterday should have has_error: false
+      expect(results[1]).toEqual({
+        day: expect.any(Date),
+        has_error: false,
+      })
+    })
+
+    test('handles custom timezone', async () => {
+      const now = new Date()
+
+      await Seed.healthCheckResult(db, {
+        id: 'hcr_1',
+        health_check_id: 'hc_test123456',
+        created_at: now,
+        error: null,
+      })
+
+      const results = await HealthCheckResults.listAggregate(
+        'hc_test123456',
+        'America/New_York',
+      )
+      expect(results).toHaveLength(1)
+      expect(results[0]).toEqual({
+        day: expect.any(Date),
+        has_error: false,
+      })
+    })
+
+    test('aggregates multiple days correctly', async () => {
+      const today = new Date()
+      const yesterday = new Date(today)
+      yesterday.setDate(yesterday.getDate() - 1)
+      const twoDaysAgo = new Date(today)
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+
+      // Add results for each day
+      await Seed.healthCheckResult(db, {
+        id: 'hcr_1',
+        health_check_id: 'hc_test123456',
+        created_at: today,
+        error: null,
+      })
+      await Seed.healthCheckResult(db, {
+        id: 'hcr_2',
+        health_check_id: 'hc_test123456',
+        created_at: yesterday,
+        error: 'Error occurred',
+      })
+      await Seed.healthCheckResult(db, {
+        id: 'hcr_3',
+        health_check_id: 'hc_test123456',
+        created_at: twoDaysAgo,
+        error: null,
+      })
+
+      const results = await HealthCheckResults.listAggregate('hc_test123456')
+      expect(results).toHaveLength(3)
+
+      // Results should be ordered by day DESC
+      const day0 = results[0]?.day
+      const day1 = results[1]?.day
+      const day2 = results[2]?.day
+      expect(day0).toBeDefined()
+      expect(day1).toBeDefined()
+      expect(day2).toBeDefined()
+      expect(day0!.getTime()).toBeGreaterThan(day1!.getTime())
+      expect(day1!.getTime()).toBeGreaterThan(day2!.getTime())
+
+      // Verify error aggregation
+      expect(results[0]?.has_error).toBe(false) // Today
+      expect(results[1]?.has_error).toBe(true) // Yesterday
+      expect(results[2]?.has_error).toBe(false) // Two days ago
+    })
+  })
 })
