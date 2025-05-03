@@ -34,6 +34,10 @@ export namespace DB {
       response_headers?: Record<string, any> | null
       error?: string | null
     }
+    export type ListAggregateResult = {
+      day: Date
+      has_error: boolean
+    }
   }
 
   export type HealthCheckResult = Base & {
@@ -112,10 +116,31 @@ async function list(
   return rows
 }
 
+async function listAggregate(
+  this: Database,
+  health_check_id: string,
+  timezone: string = 'UTC',
+): Promise<DB.HealthCheckResult.ListAggregateResult[]> {
+  const { rows } = await this.query<DB.HealthCheckResult.ListAggregateResult>(
+    `
+      SELECT 
+        (DATE_TRUNC('day', created_at AT TIME ZONE $2) AT TIME ZONE $2)::DATE as day,
+        BOOL_OR(error IS NOT NULL) as has_error
+      FROM health_check_results
+      WHERE health_check_id = $1
+      GROUP BY DATE_TRUNC('day', created_at AT TIME ZONE $2)
+      ORDER BY day DESC
+    `,
+    [health_check_id, timezone],
+  )
+  return rows
+}
+
 export function createHealthCheckResultFactory(db: Database) {
   return {
     create: create.bind(db),
     list: list.bind(db),
+    listAggregate: listAggregate.bind(db),
   }
 }
 

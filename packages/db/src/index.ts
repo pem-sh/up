@@ -17,6 +17,10 @@ namespace DB {
   export type User = UserDB.User
   export type HealthCheck = HealthCheckDB.HealthCheck
   export type HealthCheckResult = HealthCheckResultDB.HealthCheckResult
+  export namespace HealthCheckResult {
+    export type ListAggregateResult =
+      HealthCheckResultDB.HealthCheckResult.ListAggregateResult
+  }
 }
 
 export type { DB }
