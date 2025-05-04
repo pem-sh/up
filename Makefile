@@ -4,6 +4,9 @@ run:
 test:
 	pnpm test
 
+lint:
+	pnpm lint
+
 dev.db.up:
 	docker run --rm --publish 5432:5432 --name=up -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=up -d postgres
 	@echo "Waiting 10 seconds for database to start..."

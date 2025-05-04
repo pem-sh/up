@@ -13,16 +13,16 @@
   },
   "dependencies": {
     "@pem/api": "workspace:*",
-    "axios": "1.6.7",
-    "dotenv": "16.4.5"
+    "axios": "1.9.0",
+    "dotenv": "16.5.0"
   },
   "devDependencies": {
-    "@eslint/js": "9.17.0",
+    "@eslint/js": "9.26.0",
     "@types/dotenv": "8.2.3",
-    "@types/node": "20.11.24",
-    "eslint": "9.21.0",
+    "@types/node": "22.15.3",
+    "eslint": "9.26.0",
     "globals": "15.12.0",
-    "tsx": "4.7.1",
-    "typescript": "5.5.4"
+    "tsx": "4.19.4",
+    "typescript": "5.8.3"
   }
 }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace */
 import { createHealthCheckFactory, DB as HealthCheckDB } from './health-check'
 import {
   createHealthCheckResultFactory,
