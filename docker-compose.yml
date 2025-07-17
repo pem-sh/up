@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:17.5-alpine
+    container_name: up-pem-sh-postgres
+    restart: unless-stopped
+    env_file:
+      - .env.postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '${TAILSCALE_IP:-127.0.0.1}:5432:5432'
+    networks:
+      - up-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U up_user -d up']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  up-pem-sh:
+    container_name: up-pem-sh
+    image: ghcr.io/pem-sh/up:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - up-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  up-network:
+    driver: bridge
