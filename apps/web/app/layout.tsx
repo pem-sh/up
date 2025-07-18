@@ -4,8 +4,9 @@ import { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'up.pem.sh',
-  description: '',
+  title: 'Up - Open Source Uptime Monitoring',
+  description:
+    'A better uptime monitoring solution. Alert on website downtime, DNS/TLS/Domain checks built in. Fully open source.',
 }
 
 export default function RootLayout({
@@ -17,7 +18,14 @@ export default function RootLayout({
     <html lang="en">
       <meta name="apple-mobile-web-app-title" content="Up" />
       <body>
-        <Theme>{children}</Theme>
+        <Theme
+          appearance="light"
+          accentColor="gray"
+          grayColor="gray"
+          radius="none"
+        >
+          {children}
+        </Theme>
       </body>
     </html>
   )

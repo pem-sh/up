@@ -1,1 +1,40 @@
 @import "tailwindcss";
+
+/* Custom stark theme overrides */
+:root {
+  --gray-1: #ffffff;
+  --gray-2: #fafafa;
+  --gray-3: #f5f5f5;
+  --gray-4: #e5e5e5;
+  --gray-5: #d4d4d4;
+  --gray-6: #a3a3a3;
+  --gray-7: #737373;
+  --gray-8: #525252;
+  --gray-9: #404040;
+  --gray-10: #262626;
+  --gray-11: #171717;
+  --gray-12: #000000;
+}
+
+body {
+  background: var(--gray-1);
+  color: var(--gray-12);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure Radix components follow stark theme */
+.rt-Theme {
+  --accent-1: var(--gray-1);
+  --accent-2: var(--gray-2);
+  --accent-3: var(--gray-3);
+  --accent-4: var(--gray-4);
+  --accent-5: var(--gray-5);
+  --accent-6: var(--gray-6);
+  --accent-7: var(--gray-7);
+  --accent-8: var(--gray-8);
+  --accent-9: var(--gray-12);
+  --accent-10: var(--gray-12);
+  --accent-11: var(--gray-12);
+  --accent-12: var(--gray-1);
+}
